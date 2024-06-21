@@ -24,6 +24,18 @@
       {
         "command": "newon.detectPathTraversal",
         "title": "newon.detectPathTraversal"
+      },
+      {
+        "command": "newon.detectSourceInjection",
+        "title": "newon.detectSourceInjection"
+      },
+      {
+        "command": "newon.detectXMLInjection",
+        "title": "newon.detectXMLInjection"
+      },
+      {
+        "command": "newon.detectCSRF",
+        "title": "newon.detectCSRF"
       }
     ]
   },

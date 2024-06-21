@@ -5,6 +5,7 @@ import { detectSourceInjection } from './detectSourceInjection';
 import { detectXMLInjection } from './detectXMLInjection';
 import { detectLDAPInjection } from './detectLDAPInjection';
 import { checkCSRFToken } from './csrfChecker';
+import { checkSecurityIssues } from './securityChecker';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -116,6 +117,18 @@ export function activate(context: vscode.ExtensionContext) {
             }
         } else {
             vscode.window.showInformationMessage('No active text editor found.');
+        }
+    });
+
+	console.log('Security Checker is now active!');
+
+    const diagnosticCollection = vscode.languages.createDiagnosticCollection('securityChecker');
+    context.subscriptions.push(diagnosticCollection);
+
+    vscode.workspace.onDidSaveTextDocument((document) => {
+        if (document.languageId === 'javascript') {
+            const diagnostics = checkSecurityIssues(document);
+            diagnosticCollection.set(document.uri, diagnostics);
         }
     });
 

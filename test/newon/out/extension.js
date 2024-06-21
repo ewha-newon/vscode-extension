@@ -32,6 +32,7 @@ const detectSourceInjection_1 = require("./detectSourceInjection");
 const detectXMLInjection_1 = require("./detectXMLInjection");
 const detectLDAPInjection_1 = require("./detectLDAPInjection");
 const csrfChecker_1 = require("./csrfChecker");
+const securityChecker_1 = require("./securityChecker");
 function activate(context) {
     console.log('Congratulations, your extension "newon" is now active!');
     const disposable = vscode.commands.registerCommand('newon.helloWorld', () => {
@@ -142,6 +143,15 @@ function activate(context) {
         }
         else {
             vscode.window.showInformationMessage('No active text editor found.');
+        }
+    });
+    console.log('Security Checker is now active!');
+    const diagnosticCollection = vscode.languages.createDiagnosticCollection('securityChecker');
+    context.subscriptions.push(diagnosticCollection);
+    vscode.workspace.onDidSaveTextDocument((document) => {
+        if (document.languageId === 'javascript') {
+            const diagnostics = (0, securityChecker_1.checkSecurityIssues)(document);
+            diagnosticCollection.set(document.uri, diagnostics);
         }
     });
     context.subscriptions.push(disposable);

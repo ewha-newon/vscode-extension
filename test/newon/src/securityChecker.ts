@@ -1,17 +1,8 @@
 import * as vscode from 'vscode';
-import * as acorn from 'acorn';
 
 export function checkSecurityIssues(document: vscode.TextDocument): vscode.Diagnostic[] {
     const diagnostics: vscode.Diagnostic[] = [];
     const sourceCode = document.getText();
-
-    let ast;
-    try {
-        ast = acorn.parse(sourceCode, { ecmaVersion: 'latest' });
-    } catch (e) {
-        console.error('Error parsing JavaScript file:', e);
-        return diagnostics;
-    }
 
     // 정규 표현식 패턴들
     const patterns = [
@@ -37,26 +28,22 @@ export function checkSecurityIssues(document: vscode.TextDocument): vscode.Diagn
         },
     ];
 
-    // AST를 통해 정규 표현식 패턴을 검색하여 Diagnostic을 생성
-    function searchAST(node: any) {
-        patterns.forEach(({ pattern, message }) => {
-            if (pattern.test(sourceCode)) {
-                let match;
-                while ((match = pattern.exec(sourceCode)) !== null) {
-                    const startPosition = document.positionAt(match.index);
-                    const endPosition = document.positionAt(match.index + match[0].length);
+    // 정규 표현식을 사용하여 검사 수행
+    patterns.forEach(({ pattern, message }) => {
+        let match;
+        while ((match = pattern.exec(sourceCode)) !== null) {
+            const startPosition = document.positionAt(match.index);
+            const endPosition = document.positionAt(match.index + match[0].length);
 
-                    const diagnostic = new vscode.Diagnostic(
-                        new vscode.Range(startPosition, endPosition),
-                        message,
-                        message.includes('Warning') ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error
-                    );
+            const diagnostic = new vscode.Diagnostic(
+                new vscode.Range(startPosition, endPosition),
+                message,
+                message.includes('Warning') ? vscode.DiagnosticSeverity.Warning : vscode.DiagnosticSeverity.Error
+            );
 
-                    diagnostics.push(diagnostic);
-                }
-            }
-        });
-    }
+            diagnostics.push(diagnostic);
+        }
+    });
 
     return diagnostics;
 }

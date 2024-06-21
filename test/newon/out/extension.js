@@ -146,14 +146,16 @@ function activate(context) {
         }
     });
     console.log('Security Checker is now active!');
-    const diagnosticCollection = vscode.languages.createDiagnosticCollection('securityChecker');
-    context.subscriptions.push(diagnosticCollection);
+    // 파일 저장 시 보안 문제 검사
+    const diagnosticsCollection = vscode.languages.createDiagnosticCollection('securityChecker');
     vscode.workspace.onDidSaveTextDocument((document) => {
         if (document.languageId === 'javascript') {
             const diagnostics = (0, securityChecker_1.checkSecurityIssues)(document);
-            diagnosticCollection.set(document.uri, diagnostics);
+            diagnosticsCollection.set(document.uri, diagnostics);
         }
     });
+    // 확장 프로그램 종료 시 컬렉션 정리
+    context.subscriptions.push(diagnosticsCollection);
     context.subscriptions.push(disposable);
     context.subscriptions.push(detectEvalCommand);
     context.subscriptions.push(detectPathTraversalCommand);
